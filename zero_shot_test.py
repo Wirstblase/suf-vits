@@ -1,6 +1,6 @@
 import torch
 import soundfile as sf
-from speechbrain.pretrained import EncoderClassifier
+#from speechbrain.pretrained import EncoderClassifier
 import utils
 import commons
 from text import text_to_sequence
@@ -16,11 +16,32 @@ def get_text(text, hparams):
     return text_normalized
 
 
+import requests
+
+def get_speaker_embedding(audio_file_path):
+    url = 'http://localhost:5222/get_embedding'
+    files = {'file': open(audio_file_path, 'rb')}
+    response = requests.post(url, files=files)
+
+    if response.status_code == 200:
+        embedding = response.json()['embedding']
+        return embedding
+    else:
+        print(f"Error: {response.json()['error']}")
+        return None
+
+
+#embedding = get_speaker_embedding('samples/suflea_sample.wav')
+#print(embedding)
+
+
 def extract_speaker_embedding(audio_path):
-    classifier = EncoderClassifier.from_hparams(source="speechbrain/spkrec-ecapa-voxceleb")
-    signal, _ = sf.read(audio_path)
-    embeddings = classifier.encode_batch(torch.tensor(signal).unsqueeze(0))
-    return embeddings.squeeze().cpu().numpy()
+    #classifier = EncoderClassifier.from_hparams(source="speechbrain/spkrec-ecapa-voxceleb")
+    #signal, _ = sf.read(audio_path)
+    #embeddings = classifier.encode_batch(torch.tensor(signal).unsqueeze(0))
+    #return embeddings.squeeze().cpu().numpy()
+    embedding = get_speaker_embedding(audio_path)
+    return embedding
 
 
 # Load hyperparameters
